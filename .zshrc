@@ -17,15 +17,24 @@ EDIT='subl'
 
 
 ########################################
+# Prompt
+export PS1='%2d %# '
+
+########################################
 # regular aliases
 
 alias ll='ls -lart'
 alias stripstyle='pbpaste | pbcopy'
 
 
+
+
 ########################################
 # history
 # todo
+alias h="history -50"
+alias hh="history -500"
+alias hhh="history 0"
 
 
 ########################################
