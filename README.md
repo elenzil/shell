@@ -2,6 +2,4 @@
 
 general purpose shell things.
 
-## March 2024
-Starting a new thing, .zshrc.
-
+see top of .zshrc for more.
