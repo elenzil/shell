@@ -13,7 +13,7 @@
 #
 
 ########################################
-# functions
+# functions used by stuff in this file
 
 sourceIfExists() {
     if [ -f "${1}" ]; then
@@ -61,6 +61,10 @@ export HISTSIZE=10000
 # Maximum lines saved to $HISTFILE
 export SAVEHIST=10000
 
+
+########################################
+# Git
+alias gitlog="git log --pretty=format:'%h %<(15,trunc)%an %<(11,trunc)%as %<(35,trunc)%s' --abbrev-commit"
 
 ########################################
 # misc
