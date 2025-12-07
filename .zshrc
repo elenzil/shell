@@ -41,7 +41,11 @@ EDIT='subl'
 
 ########################################
 # Prompt
-export PS1='%2d %# '
+#
+# %?  = last exit code 
+# %2d = last two elements of pwd
+# %#  = '%' ?
+export PS1="%?) %2d/ %# "
 
 ########################################
 # regular aliases
