@@ -21,14 +21,18 @@ sourceIfExists() {
     fi
 }
 
+addDirToPathIfExists() {
+    if [ -d "${1}" ]; then
+        PATH=${PATH}:${1}
+    fi
+}
+
 
 ########################################
 # path
 
-# add ${HOME}/bin/ to the path, if it exists.
-if [ -d ${HOME}/bin ]; then
-    PATH=${PATH}:${HOME}/bin
-fi
+addDirToPathIfExists "${HOME}/bin"
+addDirToPathIfExists "${HOME}/bin/stl_cmd/bin"
 
 ########################################
 # self-referential stuff
@@ -52,6 +56,8 @@ export PS1="%?) %2d/ %# "
 
 alias ll='ls -lart'
 alias stripstyle='pbpaste | pbcopy'
+alias openDownloads='open "${HOME}/Downloads"'
+alias openDesktop='open "${HOME}/Desktop"'
 
 ########################################
 # history
@@ -106,4 +112,15 @@ setupNewComputer() {
 
 # enable history-based suggestions
 sourceIfExists "$(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
+
+########################################
+# Misc one-liners
+
+
+function convertAllSTLFilesToBinary() {
+    find . -name "*.stl" -exec printf "{}.." \; -exec mv {} /tmp/stl_convert.stl \; -exec stl_binary /tmp/stl_convert.stl {} \; -exec printf "\n" \; -exec rm /tmp/stl_convert.stl \;    
+}
+
+
+
 
