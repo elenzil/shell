@@ -1,0 +1,84 @@
+#!/bin/bash
+set -euo pipefail
+
+usage() {
+    echo "Usage: $(basename "$0") input.pxd [output.png]" >&2
+    echo "Converts a Pixelmator Pro .pxd file to PNG." >&2
+    echo "If output.png is omitted, writes alongside the input file." >&2
+}
+
+if (( $# < 1 || $# > 2 )); then
+    usage
+    exit 1
+fi
+
+if [[ ! -f "$1" || ! -r "$1" ]]; then
+    echo "Error: Cannot read input file: $1" >&2
+    exit 1
+fi
+
+input="$(cd "$(dirname "$1")" && pwd -P)/$(basename "$1")"
+
+if [[ $# -eq 1 ]]; then
+    if [[ "$input" != *.pxd ]]; then
+        echo "Error: Input filename must end in .pxd" >&2
+        exit 1
+    fi
+    output="${input%.pxd}.png"
+else
+    output="$2"
+fi
+
+output_dir="$(dirname "$output")"
+
+if [[ ! -d "$output_dir" || ! -w "$output_dir" ]]; then
+    echo "Error: Output directory is not writable: $output_dir" >&2
+    exit 1
+fi
+
+output="$(cd "$output_dir" && pwd -P)/$(basename "$output")"
+
+if [[ "$input" == "$output" || ( -e "$output" && "$input" -ef "$output" ) ]]; then
+    echo "Error: Input and output refer to the same file." >&2
+    exit 1
+fi
+
+# if [[ -e "$output" ]]; then
+#     echo "Error: Output already exists: $output" >&2
+#     exit 1
+# fi
+
+osascript - "$input" "$output" <<'APPLESCRIPT'
+on run argv
+    set inputFile to POSIX file (item 1 of argv)
+    set outputFile to (POSIX file (item 2 of argv)) as text
+
+    set wasRunning to application "Pixelmator Pro" is running
+    set openedDoc to missing value
+
+    tell application "Pixelmator Pro"
+        try
+            set openedDoc to open inputFile
+            export openedDoc to file outputFile as PNG
+            close openedDoc saving no
+            set openedDoc to missing value
+        on error errMsg number errNum
+            if openedDoc is not missing value then
+                try
+                    close openedDoc saving no
+                end try
+            end if
+
+            if not wasRunning then
+                try
+                    quit
+                end try
+            end if
+
+            error errMsg number errNum
+        end try
+
+        if not wasRunning then quit
+    end tell
+end run
+APPLESCRIPT
